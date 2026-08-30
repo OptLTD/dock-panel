@@ -14,7 +14,7 @@ const router = useRouter();
 const { refresh, summaryLabel } = useProjects();
 
 const project = ref<Project | null>(null);
-const tab = ref<"services" | "logs" | "certs" | "compose">("services");
+const tab = ref<"services" | "logs" | "certs" | "compose" | "env">("services");
 const busy = ref("");
 const output = ref("");
 const composeYaml = ref("");
@@ -104,7 +104,22 @@ async function saveCompose() {
       env_text: envText.value,
       notes: project.value.notes,
     });
-    toast.info("已保存");
+    toast.info("Compose 已保存");
+    await load();
+  } catch (error) {
+    toast.error(error instanceof Error ? error.message : String(error));
+  }
+}
+
+async function saveEnv() {
+  if (!project.value) return;
+  try {
+    await api.updateProject(project.value.name, {
+      compose_yaml: composeYaml.value,
+      env_text: envText.value,
+      notes: project.value.notes,
+    });
+    toast.info("环境信息已保存");
     await load();
   } catch (error) {
     toast.error(error instanceof Error ? error.message : String(error));
@@ -272,6 +287,7 @@ onBeforeUnmount(stopFollow);
       <button type="button" :class="{ active: tab === 'logs' }" @click="tab = 'logs'">日志</button>
       <button type="button" :class="{ active: tab === 'certs' }" @click="tab = 'certs'">证书</button>
       <button type="button" :class="{ active: tab === 'compose' }" @click="tab = 'compose'">Compose</button>
+      <button type="button" :class="{ active: tab === 'env' }" @click="tab = 'env'">环境信息</button>
     </div>
 
     <div v-if="tab === 'services'" class="card" style="padding: 0">
@@ -372,23 +388,29 @@ onBeforeUnmount(stopFollow);
       </div>
     </div>
 
-    <div v-else class="card">
+    <div v-else-if="tab === 'compose'" class="card">
       <div class="field">
         <label>compose.yaml</label>
-        <textarea v-model="composeYaml" style="min-height: 320px"></textarea>
-      </div>
-      <div class="field" style="margin-top: 12px">
-        <label>.env</label>
-        <textarea v-model="envText" style="min-height: 120px"></textarea>
+        <textarea v-model="composeYaml" style="min-height: 420px"></textarea>
       </div>
       <div class="row" style="margin-top: 12px; justify-content: space-between">
-        <button class="btn primary" type="button" @click="saveCompose">保存</button>
+        <button class="btn primary" type="button" @click="saveCompose">保存 Compose</button>
         <div class="row">
           <button class="btn danger" type="button" @click="destroy(false)">取消登记</button>
           <button v-if="project.managed" class="btn danger" type="button" @click="destroy(true)">
             删除托管文件
           </button>
         </div>
+      </div>
+    </div>
+
+    <div v-else-if="tab === 'env'" class="card">
+      <div class="field">
+        <label>.env 环境变量</label>
+        <textarea v-model="envText" style="min-height: 420px" placeholder="KEY=value"></textarea>
+      </div>
+      <div class="row" style="margin-top: 12px">
+        <button class="btn primary" type="button" @click="saveEnv">保存环境信息</button>
       </div>
     </div>
 

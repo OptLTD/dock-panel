@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
-import { Boxes, FolderPlus, Plus, RefreshCw } from "lucide-vue-next";
+import { FolderPlus, Plus, RefreshCw } from "lucide-vue-next";
 import { api } from "./api/client";
 import type { ScanHit } from "./api/types";
 import Modal from "./components/Modal.vue";
@@ -123,14 +123,8 @@ watch(
 <template>
   <div class="shell">
     <aside class="side">
-      <div class="brand">
-        <div class="brand-mark">
-          <Boxes :size="18" />
-        </div>
-        <div>
-          <h1>Dock Panel</h1>
-          <p>项目列表</p>
-        </div>
+      <div class="side-top">
+        <span class="side-title">项目</span>
         <button class="btn ghost icon-btn" type="button" title="刷新列表" :disabled="state.loading" @click="loadList">
           <RefreshCw :size="14" />
         </button>

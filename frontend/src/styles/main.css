@@ -72,6 +72,19 @@ button {
   gap: 22px;
 }
 
+.side-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 4px;
+}
+
+.side-title {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
 .brand {
   display: flex;
   gap: 12px;
