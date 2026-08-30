@@ -72,15 +72,67 @@ services:
 
 ## 安装
 
-```bash
-# 构建前端并安装到系统路径
-sudo make install
+服务器只要有 curl。前端由 GitHub Actions 编译，Release 里提供安装包。
 
-# 开发机：把构建产物链接到用户 Cockpit 目录，后端链接到 /usr/libexec
-make devel-install
+```bash
+curl -fsSL https://github.com/OptLTD/dock-panel/releases/latest/download/install.sh | sudo sh
+sudo systemctl restart cockpit
 ```
 
-安装后打开 `https://<host>:9090`，侧栏 **Dock Panel**。若菜单未出现，执行 `systemctl restart cockpit` 或重新登录。
+指定版本：
+
+```bash
+curl -fsSL https://github.com/OptLTD/dock-panel/releases/latest/download/install.sh | sudo sh -s -- --version 0.1.0
+```
+
+然后打开 `https://<服务器>:9090`，侧栏会出现 **Dock Panel**。
+
+私有仓库需要带 token：
+
+```bash
+curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+  https://github.com/OptLTD/dock-panel/releases/latest/download/install.sh \
+  | sudo GH_TOKEN="$GH_TOKEN" sh
+```
+
+发布新版本（本机打 tag，Actions 自动编译并上传 Release）：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+也可在 GitHub Actions 里手动跑 **Release** 工作流。
+
+### 本机打包后拷到服务器
+
+不经过 GitHub 时，开发机需要 Node.js 18+：
+
+```bash
+make dist
+scp dist/dock-panel-0.1.0.tar.gz user@server:
+```
+
+服务器：
+
+```bash
+tar xf dock-panel-0.1.0.tar.gz
+cd dock-panel-0.1.0
+sudo ./install.sh
+sudo systemctl restart cockpit
+```
+
+若本机就是那台服务器：
+
+```bash
+sudo make install
+```
+
+开发机热更新（链接到用户目录，不写系统路径）：
+
+```bash
+make devel-install
+```
 
 仅预览 UI（无系统权限）：
 
