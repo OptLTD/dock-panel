@@ -14,7 +14,7 @@ const router = useRouter();
 const { refresh, summaryLabel } = useProjects();
 
 const project = ref<Project | null>(null);
-const tab = ref<"services" | "logs" | "certs" | "compose" | "env">("services");
+const tab = ref<"services" | "logs" | "certs" | "compose" | "env">("compose");
 const busy = ref("");
 const output = ref("");
 const composeYaml = ref("");
@@ -277,7 +277,6 @@ onBeforeUnmount(stopFollow);
           <span class="badge">{{ project.managed ? "托管项目" : "外部 Compose" }}</span>
           <span v-if="project.error" class="badge danger">{{ project.error }}</span>
         </div>
-        <p class="mono">{{ project.compose_file }}</p>
       </div>
       <div class="row">
         <button class="btn primary" type="button" :disabled="Boolean(busy)" @click="runAction('up')">启动</button>
@@ -289,10 +288,10 @@ onBeforeUnmount(stopFollow);
     </div>
 
     <div class="tabs">
+      <button type="button" :class="{ active: tab === 'compose' }" @click="tab = 'compose'">Compose</button>
       <button type="button" :class="{ active: tab === 'services' }" @click="tab = 'services'">服务</button>
       <button type="button" :class="{ active: tab === 'logs' }" @click="tab = 'logs'">日志</button>
       <button type="button" :class="{ active: tab === 'certs' }" @click="tab = 'certs'">证书</button>
-      <button type="button" :class="{ active: tab === 'compose' }" @click="tab = 'compose'">Compose</button>
       <button type="button" :class="{ active: tab === 'env' }" @click="tab = 'env'">环境信息</button>
     </div>
 
@@ -396,7 +395,7 @@ onBeforeUnmount(stopFollow);
 
     <div v-else-if="tab === 'compose'" class="card">
       <div class="field">
-        <label>compose.yaml</label>
+        <label class="mono">{{ project.compose_file }}</label>
         <textarea v-model="composeYaml" style="min-height: 420px"></textarea>
       </div>
       <div class="row" style="margin-top: 12px; justify-content: space-between">
