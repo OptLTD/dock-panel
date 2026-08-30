@@ -64,7 +64,7 @@ services:
 服务器上需要：
 
 - Cockpit
-- Python 3.9+
+- Python 3.6+（兼容 CentOS 7 / Python 3.6.8）
 - Docker Engine + Compose v2 插件（`docker compose`）
 - openssl（证书功能）
 

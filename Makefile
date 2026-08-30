@@ -10,7 +10,7 @@ BACKEND := backend
 DISTDIR := dist
 DISTNAME := $(PACKAGE)-$(VERSION)
 
-.PHONY: all build dist install install-files devel-install uninstall clean test watch
+.PHONY: all build dist pack install install-files devel-install uninstall clean test watch
 
 all: build
 
@@ -18,9 +18,12 @@ build:
 	cd $(FRONTEND) && npm ci && npm run build
 
 # 本机编译，生成可拷到服务器的 tar.gz（服务器无需 Node）
-dist: build
+dist: build pack
+
+pack:
 	rm -rf $(DISTDIR)/$(DISTNAME)
 	mkdir -p $(DISTDIR)/$(DISTNAME)/cockpit $(DISTDIR)/$(DISTNAME)/backend
+	test -f $(FRONTEND)/dist/manifest.json
 	cp -a $(FRONTEND)/dist/. $(DISTDIR)/$(DISTNAME)/cockpit/
 	cp -a $(BACKEND)/cli.py $(DISTDIR)/$(DISTNAME)/backend/cli.py
 	cp -a $(BACKEND)/src $(DISTDIR)/$(DISTNAME)/backend/src

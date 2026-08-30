@@ -1,20 +1,20 @@
-from __future__ import annotations
-
-from typing import Any
+from typing import Any, Dict, Optional
 
 from . import docker, store
 from .errors import AppError
 from .util import run, stream_cmd
 
 
-def _project(name: str) -> dict[str, Any]:
+def _project(name):
+    # type: (str) -> Dict[str, Any]
     project = store.get_project(name)
     if not project:
-        raise AppError(f"项目不存在: {name}")
+        raise AppError("项目不存在: {}".format(name))
     return project
 
 
-def tail(name: str, *, service: str | None = None, lines: int = 200, timestamps: bool = True) -> str:
+def tail(name, service=None, lines=200, timestamps=True):
+    # type: (str, Optional[str], int, bool) -> str
     project = _project(name)
     args = docker.compose_prefix(project) + ["logs", "--no-color", "--tail", str(max(1, min(lines, 5000)))]
     if timestamps:
@@ -27,7 +27,8 @@ def tail(name: str, *, service: str | None = None, lines: int = 200, timestamps:
     return proc.stdout
 
 
-def follow(name: str, *, service: str | None = None, lines: int = 200, timestamps: bool = True) -> int:
+def follow(name, service=None, lines=200, timestamps=True):
+    # type: (str, Optional[str], int, bool) -> int
     project = _project(name)
     args = docker.compose_prefix(project) + ["logs", "--no-color", "--follow", "--tail", str(max(1, min(lines, 5000)))]
     if timestamps:

@@ -2,8 +2,8 @@
 import { computed } from "vue";
 import { RouterLink, RouterView } from "vue-router";
 import { Boxes, FileKey2, LayoutDashboard, ScrollText } from "lucide-vue-next";
-import { useToast } from "../composables/useToast";
-import { hasCockpit } from "../api/cockpit";
+import { useToast } from "./composables/useToast";
+import { hasCockpit } from "./api/cockpit";
 
 const toast = useToast();
 const cockpitReady = computed(() => hasCockpit());

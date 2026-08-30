@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 from pathlib import Path
 
@@ -37,7 +35,8 @@ SKIP_DIR_NAMES = {
 }
 
 
-def ensure_dirs() -> None:
+def ensure_dirs():
+    # type: () -> None
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     CERTS_DIR.mkdir(parents=True, exist_ok=True)
     MANAGED_DIR.mkdir(parents=True, exist_ok=True)

@@ -13,10 +13,12 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.8"
 
       - name: Backend tests
-        run: make test
+        run: |
+          python -m compileall -q backend
+          make test
 
       - uses: actions/setup-node@v4
         with:
@@ -24,5 +26,13 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Build release tarball
-        run: make dist
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Pack release tarball
+        run: make pack

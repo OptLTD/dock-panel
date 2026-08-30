@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 """Dock Panel CLI 入口。由 Cockpit 通过 cockpit.spawn 调用。"""
 
-from __future__ import annotations
-
 import os
 import sys
 
