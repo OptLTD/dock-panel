@@ -111,7 +111,6 @@ onBeforeUnmount(stopFollow);
           </select>
         </div>
         <div class="field" style="min-width: 180px">
-          <label>服务</label>
           <select v-model="serviceName">
             <option value="">全部服务</option>
             <option

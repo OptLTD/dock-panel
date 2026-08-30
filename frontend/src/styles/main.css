@@ -1,12 +1,15 @@
 :root {
-  /* 贴近 Cockpit / PatternFly dark */
+  /* 贴近 Cockpit / PatternFly dark
+     Cockpit 系统侧栏多为 #212427，插件项目栏用页面底色 #151515 区分 */
   color-scheme: dark;
   --bg: #151515;
   --bg-panel: #1b1d21;
   --bg-elev: #212427;
   --bg-hover: #2a2e33;
-  --bg-sidebar: #212427;
+  --bg-sidebar: #151515;
+  --bg-main: #1b1d21;
   --line: #444548;
+  --line-strong: #6a6e73;
   --line-light: #3c3f42;
   --text: #f0f0f0;
   --muted: #b8bbbe;
@@ -68,7 +71,7 @@ button {
 }
 
 .side {
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--line-strong);
   background: var(--bg-sidebar);
   padding: 12px 0;
   display: flex;
@@ -80,7 +83,9 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 12px 8px;
+  padding: 4px 12px 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
 }
 
 .side-title {
@@ -192,9 +197,9 @@ button {
 }
 
 .main {
-  padding: 24px;
+  padding: 20px 24px 24px;
   min-width: 0;
-  background: var(--bg);
+  background: var(--bg-main);
 }
 
 .page-head {
@@ -202,7 +207,9 @@ button {
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 16px;
+  margin: 0 0 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-strong);
 }
 
 .page-head h2 {
