@@ -1,3 +1,4 @@
+import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,25 @@ def _validate_name(name):
     if "/" in name or name.startswith("."):
         raise AppError("项目名称不合法")
     return name
+
+
+def read_compose_project_name(compose_file):
+    # type: (Path) -> Optional[str]
+    """读取 compose 顶层 name:（优先于目录名，避免 /data 被登记成 data）。"""
+    try:
+        text = compose_file.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("services:"):
+            break
+        match = re.match(r"^name:\s*[\"']?([A-Za-z0-9][A-Za-z0-9_.-]*)[\"']?\s*$", stripped)
+        if match:
+            return match.group(1)
+    return None
 
 
 def _status_from_ps(containers):
@@ -155,8 +175,12 @@ def register(payload):
     compose_file = Path(payload.get("compose_file") or "").expanduser()
     if not compose_file.is_file():
         raise AppError("compose 文件不存在: {}".format(compose_file))
-    name = _validate_name(payload.get("name") or compose_file.parent.name)
-    workdir = str(Path(payload.get("workdir") or compose_file.parent).expanduser())
+    compose_file = compose_file.resolve()
+    # 优先：用户指定 > compose 内 name: > 目录名
+    # 否则 /data + name: duolali-prod 会被错登成 data，-p data 会另起一套栈
+    inferred = read_compose_project_name(compose_file) or compose_file.parent.name
+    name = _validate_name(payload.get("name") or inferred)
+    workdir = str(Path(payload.get("workdir") or compose_file.parent).expanduser().resolve())
     env_file = payload.get("env_file")
     if env_file:
         env_path = Path(env_file).expanduser()
@@ -172,7 +196,7 @@ def register(payload):
             raise AppError("项目已存在: {}".format(name))
         record = {
             "name": name,
-            "compose_file": str(compose_file.resolve()),
+            "compose_file": str(compose_file),
             "workdir": workdir,
             "env_file": env_file,
             "managed": False,
@@ -423,11 +447,12 @@ def scan(max_depth=4):
                     continue
                 walk(entry, depth + 1)
                 continue
-            if name in paths.COMPOSE_FILENAMES:
+            if name in paths.COMPOSE_FILENAMES or name.startswith("compose.") and name.endswith((".yml", ".yaml")):
                 compose_file = str(entry.resolve()) if entry.exists() else str(entry)
+                inferred = read_compose_project_name(entry) or entry.parent.name
                 found.append(
                     {
-                        "name": entry.parent.name,
+                        "name": inferred,
                         "compose_file": compose_file,
                         "workdir": str(entry.parent),
                         "registered": compose_file in registered_files,

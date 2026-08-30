@@ -12,10 +12,26 @@ def docker_bin():
 
 def compose_prefix(project):
     # type: (Dict[str, Any]) -> List[str]
+    """构建 docker compose 命令前缀。
+
+    必须带 --project-directory，否则相对卷（如 ./cfg/ssl）会按错误目录解析，
+    导致证书挂载为空、HTTPS 失效。
+    """
     compose_file = project.get("compose_file")
     if not compose_file:
         raise AppError("项目 {} 没有 compose 文件".format(project.get("name")))
-    args = [docker_bin(), "compose", "-p", project["name"], "-f", compose_file]
+    compose_path = Path(compose_file)
+    project_dir = project.get("workdir") or str(compose_path.parent)
+    args = [
+        docker_bin(),
+        "compose",
+        "--project-directory",
+        str(project_dir),
+        "-p",
+        project["name"],
+        "-f",
+        str(compose_path),
+    ]
     env_file = project.get("env_file")
     if env_file and Path(env_file).is_file():
         args.extend(["--env-file", env_file])
@@ -25,7 +41,12 @@ def compose_prefix(project):
 def compose_cwd(project):
     # type: (Dict[str, Any]) -> Optional[str]
     workdir = project.get("workdir")
-    return workdir if workdir else None
+    if workdir:
+        return workdir
+    compose_file = project.get("compose_file")
+    if compose_file:
+        return str(Path(compose_file).parent)
+    return None
 
 
 def engine_info():

@@ -52,6 +52,29 @@ class StoreTests(unittest.TestCase):
         self.assertIn("image: ghcr.io/example/api:1", yaml_text)
         self.assertIn('A: "b c"', yaml_text)
 
+    def test_read_compose_project_name(self):
+        compose = paths.MANAGED_DIR / "sample-compose.yaml"
+        paths.MANAGED_DIR.mkdir(parents=True, exist_ok=True)
+        compose.write_text(
+            "# comment\nname: duolali-prod\n\nservices:\n  app:\n    image: nginx\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(projects.read_compose_project_name(compose), "duolali-prod")
+
+    def test_compose_prefix_uses_project_directory(self):
+        from src.docker import compose_prefix
+
+        args = compose_prefix(
+            {
+                "name": "duolali-prod",
+                "compose_file": "/data/compose.prod.yaml",
+                "workdir": "/data",
+            }
+        )
+        self.assertIn("--project-directory", args)
+        self.assertEqual(args[args.index("--project-directory") + 1], "/data")
+        self.assertEqual(args[args.index("-p") + 1], "duolali-prod")
+
     def test_cli_health_json(self):
         with mock.patch(
             "src.docker.engine_info",

@@ -18,6 +18,7 @@ SCAN_ROOTS = (
     Path("/srv"),
     Path("/home"),
     Path("/root"),
+    Path("/data"),
     Path("/var/lib/dock-panel/projects"),
     Path("/etc/compose"),
 )
