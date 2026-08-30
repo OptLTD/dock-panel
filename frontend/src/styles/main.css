@@ -1,27 +1,26 @@
 :root {
-  /* 贴近 Cockpit / PatternFly dark
-     Cockpit 系统侧栏多为 #212427，插件项目栏用页面底色 #151515 区分 */
-  color-scheme: dark;
-  --bg: #151515;
-  --bg-panel: #1b1d21;
-  --bg-elev: #212427;
-  --bg-hover: #2a2e33;
-  --bg-sidebar: #151515;
-  --bg-main: #1b1d21;
-  --line: #444548;
-  --line-strong: #6a6e73;
-  --line-light: #3c3f42;
-  --text: #f0f0f0;
-  --muted: #b8bbbe;
+  /* PatternFly light：白底内容区，与 Cockpit 深色外壳自然区分 */
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-panel: #ffffff;
+  --bg-elev: #f0f0f0;
+  --bg-hover: #f0f0f0;
+  --bg-sidebar: #fafafa;
+  --bg-main: #ffffff;
+  --line: #d2d2d2;
+  --line-strong: #b8bbbe;
+  --line-light: #e0e0e0;
+  --text: #151515;
+  --muted: #6a6e73;
   --faint: #8a8d90;
   --accent: #06c;
-  --accent-hover: #004d99;
+  --accent-hover: #004080;
   --ok: #3e8635;
-  --ok-text: #bde5b8;
+  --ok-text: #1e4f18;
   --warn: #f0ab00;
-  --warn-text: #f9e0a2;
+  --warn-text: #795600;
   --danger: #c9190b;
-  --danger-text: #f9d2d0;
+  --danger-text: #a30000;
   --radius: 0;
   --mono: "RedHatMono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --sans: "RedHatText", "Overpass", "Helvetica Neue", Arial, sans-serif;
@@ -286,30 +285,30 @@ button {
 .badge.ok {
   color: var(--ok-text);
   border-color: var(--ok);
-  background: rgba(62, 134, 53, 0.18);
+  background: #f3faf2;
 }
 
 .badge.warn {
   color: var(--warn-text);
   border-color: var(--warn);
-  background: rgba(240, 171, 0, 0.16);
+  background: #fdf7e7;
 }
 
 .badge.danger {
   color: var(--danger-text);
   border-color: var(--danger);
-  background: rgba(201, 25, 11, 0.16);
+  background: #faeae8;
 }
 
 .badge.accent {
-  color: #8bc1f7;
+  color: #002952;
   border-color: var(--accent);
-  background: rgba(0, 102, 204, 0.18);
+  background: #e7f1fa;
 }
 
 .btn {
   border: 1px solid var(--line);
-  background: var(--bg-elev);
+  background: var(--bg);
   color: var(--text);
   border-radius: 0;
   padding: 6px 12px;
@@ -340,8 +339,9 @@ button {
 }
 
 .btn.danger {
-  color: var(--danger-text);
+  color: var(--danger);
   border-color: var(--danger);
+  background: var(--bg);
 }
 
 .btn.ghost {
@@ -457,7 +457,7 @@ button {
 .modal-mask {
   position: fixed;
   inset: 0;
-  background: rgba(3, 3, 3, 0.6);
+  background: rgba(3, 3, 3, 0.45);
   display: grid;
   place-items: center;
   z-index: 50;
@@ -469,7 +469,7 @@ button {
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   max-height: calc(100vh - 40px);
   overflow: auto;
 }
@@ -531,7 +531,7 @@ button {
 }
 
 .log-view {
-  background: var(--bg);
+  background: #fafafa;
   border: 1px solid var(--line);
   border-radius: 0;
   min-height: 420px;
@@ -556,12 +556,12 @@ button {
 }
 
 .toast {
-  background: var(--bg-elev);
+  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 0;
   padding: 10px 12px;
   min-width: 240px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .toast.error {
@@ -582,7 +582,7 @@ button {
 
 .warn-banner {
   border: 1px solid var(--warn);
-  background: rgba(240, 171, 0, 0.12);
+  background: #fdf7e7;
   color: var(--warn-text);
   border-radius: 0;
   padding: 10px 12px;

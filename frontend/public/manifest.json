@@ -2,7 +2,7 @@
   "requires": {
     "cockpit": "266"
   },
-  "version": "0.1.10",
+  "version": "0.1.11",
   "menu": {
     "index": {
       "label": "Dock Panel",
