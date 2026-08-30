@@ -62,7 +62,10 @@ onMounted(load);
     </div>
 
     <div v-if="health && !health.engine.docker" class="warn-banner">
-      未检测到 Docker 引擎{{ health.engine.error ? `：${health.engine.error}` : "" }}
+      未检测到 Docker 引擎{{ health.engine.error ? `：${health.engine.error}` : "" }}。请确认当前用户在 docker 组，或在 Cockpit 右上角开启管理员权限。
+    </div>
+    <div v-else-if="health && health.engine.docker && !health.engine.compose" class="warn-banner">
+      Docker 可用，但未检测到 Compose 插件{{ health.engine.error ? `：${health.engine.error}` : "" }}。
     </div>
 
     <div class="grid stats">
@@ -110,6 +113,7 @@ onMounted(load);
         <p class="faint mono" style="margin: 8px 0 0; font-size: 12px">
           {{ item.ports.slice(0, 3).join("  ") || "未发布端口" }}
         </p>
+        <p v-if="item.error" class="badge danger" style="margin-top: 10px">{{ item.error }}</p>
       </div>
     </div>
   </div>

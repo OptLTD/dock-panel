@@ -113,7 +113,19 @@ def _enrich(project):
     item["compose_exists"] = bool(compose_file and Path(compose_file).is_file())
     if item["compose_exists"]:
         try:
-            item.update(_status_from_ps(docker.compose_ps(item)))
+            containers, ps_error = docker.compose_ps(item)
+            item.update(_status_from_ps(containers))
+            if ps_error and not containers:
+                item["summary"] = "error"
+                item["error"] = ps_error
+            elif not containers:
+                # 再扫一遍 compose ls，提示可能登记名和实际项目名不一致
+                living = [s.get("Name") or s.get("name") for s in docker.compose_ls()]
+                living = [n for n in living if n]
+                if living and item.get("name") not in living:
+                    item["error"] = "未找到运行中的同名项目。本机 compose 项目: {}".format(
+                        ", ".join(living)
+                    )
         except Exception as exc:  # noqa: BLE001
             item["summary"] = "error"
             item["running"] = 0
@@ -127,6 +139,7 @@ def _enrich(project):
         item["total"] = 0
         item["ports"] = []
         item["services"] = []
+        item["error"] = "compose 文件不存在: {}".format(compose_file)
     item.setdefault("certs", [])
     return item
 

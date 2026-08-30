@@ -1,5 +1,5 @@
 PACKAGE := dock-panel
-VERSION ?= 0.1.3
+VERSION ?= 0.1.4
 PREFIX ?= /usr
 DESTDIR ?=
 COCKPITDIR := $(DESTDIR)$(PREFIX)/share/cockpit/$(PACKAGE)

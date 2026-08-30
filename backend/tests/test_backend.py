@@ -75,6 +75,29 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(args[args.index("--project-directory") + 1], "/data")
         self.assertEqual(args[args.index("-p") + 1], "duolali-prod")
 
+    def test_normalize_and_label_fallback_shape(self):
+        from src.docker import _normalize_container
+
+        row = _normalize_container(
+            {
+                "ID": "abc",
+                "Names": "/duolali-prod",
+                "Image": "optltd/duolali:latest",
+                "State": "running",
+                "Status": "Up 2 hours",
+                "Ports": "0.0.0.0:80->80/tcp,0.0.0.0:443->443/tcp",
+                "Labels": "com.docker.compose.project=duolali-prod,com.docker.compose.service=duolali-prod",
+            }
+        )
+        self.assertEqual(row["Name"], "duolali-prod")
+        self.assertEqual(row["State"], "running")
+        self.assertEqual(row["Service"], "duolali-prod")
+        self.assertEqual(len(row["Publishers"]), 2)
+        status = projects._status_from_ps([row])
+        self.assertEqual(status["summary"], "running")
+        self.assertEqual(status["running"], 1)
+        self.assertEqual(status["total"], 1)
+
     def test_cli_health_json(self):
         with mock.patch(
             "src.docker.engine_info",
