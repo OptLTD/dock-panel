@@ -79,6 +79,34 @@ curl -fsSL https://github.com/OptLTD/dock-panel/releases/latest/download/install
 sudo systemctl restart cockpit
 ```
 
+### 访问不了 GitHub 时
+
+**方式 A：镜像前缀**（镜像站点会变，换成你能用的即可）：
+
+```bash
+MIRROR=https://ghfast.top/
+curl -fsSL "${MIRROR}https://github.com/OptLTD/dock-panel/releases/latest/download/install.sh" \
+  | sudo DOCK_PANEL_MIRROR="$MIRROR" sh
+sudo systemctl restart cockpit
+```
+
+**方式 B：本机下载后 scp**（最稳）：
+
+```bash
+# 开发机（能访问 GitHub）
+curl -fL -o dock-panel.tar.gz \
+  https://github.com/OptLTD/dock-panel/releases/latest/download/dock-panel.tar.gz
+scp dock-panel.tar.gz user@server:
+```
+
+```bash
+# 服务器
+tar xf dock-panel.tar.gz
+cd dock-panel-*
+sudo ./install.sh
+sudo systemctl restart cockpit
+```
+
 指定版本：
 
 ```bash

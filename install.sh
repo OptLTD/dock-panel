@@ -4,8 +4,13 @@
 # 服务器一键安装（GitHub Release）：
 #   curl -fsSL https://github.com/OptLTD/dock-panel/releases/latest/download/install.sh | sudo sh
 #
+# GitHub 超时可用镜像前缀（示例，镜像站点会变，请自行替换可用的）：
+#   MIRROR=https://ghfast.top/
+#   curl -fsSL "${MIRROR}https://github.com/OptLTD/dock-panel/releases/latest/download/install.sh" \
+#     | sudo DOCK_PANEL_MIRROR="$MIRROR" sh
+#
 # 指定版本：
-#   curl -fsSL https://github.com/OptLTD/dock-panel/releases/latest/download/install.sh | sudo sh -s -- --version 0.1.0
+#   curl -fsSL .../install.sh | sudo sh -s -- --version 0.1.0
 #
 # 也可在 make dist 解压后的目录里直接执行 ./install.sh
 set -eu
@@ -14,9 +19,11 @@ REPO="${DOCK_PANEL_REPO:-OptLTD/dock-panel}"
 PREFIX="${PREFIX:-/usr}"
 DESTDIR="${DESTDIR:-}"
 VERSION="${DOCK_PANEL_VERSION:-latest}"
+# 可选：把完整 GitHub URL 套一层前缀，例如 https://ghfast.top/
+MIRROR="${DOCK_PANEL_MIRROR:-}"
 
 usage() {
-  echo "用法: $0 [--version <ver>] [--repo owner/name] [--prefix /usr]" >&2
+  echo "用法: $0 [--version <ver>] [--repo owner/name] [--prefix /usr] [--mirror <url>]" >&2
 }
 
 while [ $# -gt 0 ]; do
@@ -31,6 +38,10 @@ while [ $# -gt 0 ]; do
       ;;
     --prefix)
       PREFIX="$2"
+      shift 2
+      ;;
+    --mirror)
+      MIRROR="$2"
       shift 2
       ;;
     --help|-h)
@@ -48,6 +59,27 @@ while [ $# -gt 0 ]; do
       ;;
   esac
 done
+
+# 给 GitHub URL 套镜像前缀（若已是镜像 URL 则原样返回）
+wrap_url() {
+  _url="$1"
+  case "$_url" in
+    http://*|https://*) ;;
+    *) _url="https://$_url" ;;
+  esac
+  if [ -z "$MIRROR" ]; then
+    printf '%s\n' "$_url"
+    return
+  fi
+  case "$_url" in
+    "${MIRROR}"*)
+      printf '%s\n' "$_url"
+      ;;
+    *)
+      printf '%s%s\n' "${MIRROR}" "$_url"
+      ;;
+  esac
+}
 
 install_tree() {
   ROOT="$1"
@@ -105,9 +137,9 @@ need_cmd mktemp
 need_cmd install
 
 if [ "$VERSION" = "latest" ]; then
-  URL="https://github.com/${REPO}/releases/latest/download/dock-panel.tar.gz"
+  URL="$(wrap_url "https://github.com/${REPO}/releases/latest/download/dock-panel.tar.gz")"
 else
-  URL="https://github.com/${REPO}/releases/download/v${VERSION}/dock-panel-${VERSION}.tar.gz"
+  URL="$(wrap_url "https://github.com/${REPO}/releases/download/v${VERSION}/dock-panel-${VERSION}.tar.gz")"
 fi
 
 TMP="$(mktemp -d)"
@@ -124,12 +156,15 @@ fi
 if [ -n "$CURL_AUTH" ]; then
   if ! curl -fL --retry 3 -H "Authorization: Bearer ${CURL_AUTH}" -H "Accept: application/octet-stream" -o "$TMP/dock-panel.tar.gz" "$URL"; then
     echo "下载失败。若仓库是私有的，请设置 GH_TOKEN；并确认已发布 Release。" >&2
+    echo "国内网络可设镜像: DOCK_PANEL_MIRROR=https://ghfast.top/" >&2
+    echo "或本机 make dist 后 scp 到服务器再 sudo ./install.sh" >&2
     exit 1
   fi
 else
   if ! curl -fL --retry 3 -o "$TMP/dock-panel.tar.gz" "$URL"; then
     echo "下载失败。请确认仓库已打 tag 并成功跑通 GitHub Actions Release。" >&2
-    echo "例如: git tag v0.1.0 && git push origin v0.1.0" >&2
+    echo "国内网络可设镜像: DOCK_PANEL_MIRROR=https://ghfast.top/" >&2
+    echo "或本机 make dist 后 scp 到服务器再 sudo ./install.sh" >&2
     exit 1
   fi
 fi
