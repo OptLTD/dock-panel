@@ -22,6 +22,7 @@ const envText = ref("");
 const logText = ref("");
 const follow = ref(false);
 const logService = ref("");
+const logKeyword = ref("");
 let followHandle: { close: () => void; done: Promise<string> } | null = null;
 
 const certs = ref<Certificate[]>([]);
@@ -50,6 +51,16 @@ const linkedCerts = computed(() => {
 const otherCerts = computed(() => {
   const names = new Set(project.value?.certs || []);
   return certs.value.filter((item) => !names.has(item.name));
+});
+
+const displayedLogText = computed(() => {
+  const kw = logKeyword.value.trim();
+  if (!kw) return logText.value;
+  const lower = kw.toLowerCase();
+  return logText.value
+    .split("\n")
+    .filter((line) => line.toLowerCase().includes(lower))
+    .join("\n");
 });
 
 async function load() {
@@ -243,6 +254,7 @@ watch(
     output.value = "";
     logText.value = "";
     logService.value = "";
+    logKeyword.value = "";
     await load();
   },
 );
@@ -328,7 +340,7 @@ onBeforeUnmount(stopFollow);
     </div>
 
     <div v-else-if="tab === 'logs'">
-      <div class="row" style="margin-bottom: 12px">
+      <div class="row" style="margin: 12px 0">
         <div class="field" style="min-width: 180px">
           <!-- <label>服务</label> -->
           <select v-model="logService">
@@ -342,12 +354,15 @@ onBeforeUnmount(stopFollow);
             </option>
           </select>
         </div>
+        <div class="field" style="min-width: 200px; flex: 1">
+          <input v-model="logKeyword" type="search" placeholder="关键词筛选" />
+        </div>
         <button class="btn" type="button" @click="loadLogs">刷新</button>
         <button class="btn primary" type="button" @click="toggleFollow">
           {{ follow ? "停止跟踪" : "跟踪" }}
         </button>
       </div>
-      <LogViewer :value="logText" :follow="follow" />
+      <LogViewer :value="displayedLogText" :follow="follow" />
     </div>
 
     <div v-else-if="tab === 'certs'" class="grid">
