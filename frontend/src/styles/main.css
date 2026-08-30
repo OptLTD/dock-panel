@@ -79,6 +79,72 @@ button {
   padding: 4px 8px;
 }
 
+.brand > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.icon-btn {
+  padding: 6px 8px;
+}
+
+.project-nav {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.nav-empty {
+  padding: 16px 12px;
+  font-size: 13px;
+}
+
+.project-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--muted);
+}
+
+.project-link:hover,
+.project-link.active,
+.project-link.router-link-active {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.project-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.project-meta strong {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-meta small {
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.side-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.side-actions .btn.ghost {
+  grid-column: 1 / -1;
+}
+
 .brand-mark {
   width: 36px;
   height: 36px;
