@@ -330,7 +330,7 @@ onBeforeUnmount(stopFollow);
     <div v-else-if="tab === 'logs'">
       <div class="row" style="margin-bottom: 12px">
         <div class="field" style="min-width: 180px">
-          <label>服务</label>
+          <!-- <label>服务</label> -->
           <select v-model="logService">
             <option value="">全部 / 自动</option>
             <option
