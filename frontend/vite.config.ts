@@ -16,6 +16,9 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: false,
     target: "es2020",
+    modulePreload: {
+      polyfill: false,
+    },
     rollupOptions: {
       output: {
         manualChunks: undefined,
