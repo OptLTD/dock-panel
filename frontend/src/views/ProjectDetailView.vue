@@ -263,7 +263,20 @@ onBeforeUnmount(stopFollow);
   <div v-if="project">
     <div class="page-head">
       <div>
-        <h2>{{ project.name }}</h2>
+        <div class="row" style="align-items: center; gap: 10px">
+          <h2>{{ project.name }}</h2>
+          <span
+            class="badge"
+            :class="{
+              ok: project.summary === 'running',
+              warn: project.summary === 'partial',
+              danger: project.summary === 'error' || project.summary === 'missing',
+            }"
+          >{{ summaryLabel(project.summary) }}</span>
+          <span class="badge">{{ project.running }}/{{ project.total }} 容器</span>
+          <span class="badge">{{ project.managed ? "托管项目" : "外部 Compose" }}</span>
+          <span v-if="project.error" class="badge danger">{{ project.error }}</span>
+        </div>
         <p class="mono">{{ project.compose_file }}</p>
       </div>
       <div class="row">
@@ -273,13 +286,6 @@ onBeforeUnmount(stopFollow);
         <button class="btn" type="button" :disabled="Boolean(busy)" @click="runAction('stop')">停止</button>
         <button class="btn danger" type="button" :disabled="Boolean(busy)" @click="runAction('down')">卸载</button>
       </div>
-    </div>
-
-    <div class="row" style="margin-bottom: 16px">
-      <span class="badge">{{ summaryLabel(project.summary) }}</span>
-      <span class="badge">{{ project.running }}/{{ project.total }} 容器</span>
-      <span class="badge">{{ project.managed ? "托管项目" : "外部 Compose" }}</span>
-      <span v-if="project.error" class="badge danger">{{ project.error }}</span>
     </div>
 
     <div class="tabs">
