@@ -55,9 +55,13 @@ function startFollow() {
     serviceName.value || undefined,
     lines.value,
   );
-  handle.done.catch((error) => {
+  handle.done.catch((error: unknown) => {
     following.value = false;
-    toast.error(error instanceof Error ? error.message : String(error));
+    const err = error as { message?: string; exit_status?: number; toString?: () => string };
+    const msg =
+      (err && (err.message || (typeof err.toString === "function" ? err.toString() : ""))) ||
+      String(error);
+    toast.error(msg || "跟踪日志失败");
   });
 }
 

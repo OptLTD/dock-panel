@@ -50,7 +50,13 @@ def _status_from_ps(containers):
     for item in containers:
         state = str(item.get("State") or "").lower()
         status = str(item.get("Status") or "")
-        health = "running" if state in ("running", "up") else state or "unknown"
+        status_l = status.lower()
+        if state in ("running", "up") or state.startswith("up ") or status_l.startswith("up"):
+            health = "running"
+        elif state in ("exited", "stopped", "created", "dead", "paused") or "exit" in state:
+            health = "stopped" if "exit" in state or state == "exited" else state or "stopped"
+        else:
+            health = state or "unknown"
         if health == "running":
             running += 1
         published = item.get("Publishers") or item.get("Ports") or []

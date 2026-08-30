@@ -2,7 +2,7 @@
   "requires": {
     "cockpit": "266"
   },
-  "version": "0.1.4",
+  "version": "0.1.5",
   "menu": {
     "index": {
       "label": "Dock Panel",
@@ -10,5 +10,5 @@
       "path": "index.html"
     }
   },
-  "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:"
+  "content-security-policy": "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'sha256-3bzWVxQE32IZQKH9eh8KzyHuhXOlMrboDVVBRd0fWTU='; style-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss:; img-src 'self' data:; font-src 'self' data:; default-src 'self'"
 }

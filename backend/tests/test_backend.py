@@ -62,9 +62,10 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(projects.read_compose_project_name(compose), "duolali-prod")
 
     def test_compose_prefix_uses_project_directory(self):
-        from src.docker import compose_prefix
+        from src import docker as docker_mod
 
-        args = compose_prefix(
+        docker_mod._flavor_cache = "docker"
+        args = docker_mod.compose_prefix(
             {
                 "name": "duolali-prod",
                 "compose_file": "/data/compose.prod.yaml",
@@ -74,6 +75,22 @@ class StoreTests(unittest.TestCase):
         self.assertIn("--project-directory", args)
         self.assertEqual(args[args.index("--project-directory") + 1], "/data")
         self.assertEqual(args[args.index("-p") + 1], "duolali-prod")
+
+    def test_compose_prefix_podman_skips_project_directory(self):
+        from src import docker as docker_mod
+
+        docker_mod._flavor_cache = "podman"
+        args = docker_mod.compose_prefix(
+            {
+                "name": "duolali-prod",
+                "compose_file": "/data/compose.yaml",
+                "workdir": "/data",
+            }
+        )
+        self.assertNotIn("--project-directory", args)
+        self.assertEqual(args[:2], ["docker", "compose"])
+        self.assertIn("-f", args)
+        self.assertIn("/data/compose.yaml", args)
 
     def test_normalize_and_label_fallback_shape(self):
         from src.docker import _normalize_container

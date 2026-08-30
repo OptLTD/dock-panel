@@ -16,23 +16,32 @@ def _project(name):
 def tail(name, service=None, lines=200, timestamps=True):
     # type: (str, Optional[str], int, bool) -> str
     project = _project(name)
-    args = docker.compose_prefix(project) + ["logs", "--no-color", "--tail", str(max(1, min(lines, 5000)))]
-    if timestamps:
-        args.append("--timestamps")
-    if service:
-        args.append(service)
-    proc = run(args, cwd=docker.compose_cwd(project), check=False, timeout=60)
-    if proc.returncode != 0:
-        raise AppError((proc.stderr or proc.stdout or "读取日志失败").strip())
-    return proc.stdout
+    cmds, cwd = docker.logs_args(
+        project, follow=False, service=service, lines=lines, timestamps=timestamps
+    )
+    chunks = []
+    last_err = ""
+    for args in cmds:
+        proc = run(args, cwd=cwd, check=False, timeout=60)
+        if proc.returncode != 0:
+            last_err = (proc.stderr or proc.stdout or "读取日志失败").strip()
+            continue
+        text = proc.stdout or ""
+        if len(cmds) > 1:
+            header = args[-1] if args else "container"
+            chunks.append("----- {} -----\n{}".format(header, text))
+        else:
+            chunks.append(text)
+    if not chunks:
+        raise AppError(last_err or "读取日志失败")
+    return "\n".join(chunks)
 
 
 def follow(name, service=None, lines=200, timestamps=True):
     # type: (str, Optional[str], int, bool) -> int
     project = _project(name)
-    args = docker.compose_prefix(project) + ["logs", "--no-color", "--follow", "--tail", str(max(1, min(lines, 5000)))]
-    if timestamps:
-        args.append("--timestamps")
-    if service:
-        args.append(service)
-    return stream_cmd(args, cwd=docker.compose_cwd(project))
+    cmds, cwd = docker.logs_args(
+        project, follow=True, service=service, lines=lines, timestamps=timestamps
+    )
+    # follow 只跑第一条命令
+    return stream_cmd(cmds[0], cwd=cwd)
